@@ -1,0 +1,21 @@
+Sri Lanka country outline used for geographic context only.
+
+File: sri-lanka.geojson (unmodified source GeoJSON)
+Boundary ID: LKA-ADM0-54457186
+Year represented: 2017
+Publisher: geoBoundaries (William & Mary geoLab)
+Underlying source: OpenStreetMap, Wambacher
+License reported by source: Open Data Commons Open Database License 1.0 (ODbL)
+Attribution: OpenStreetMap contributors / Wambacher; distributed by geoBoundaries.
+
+Metadata checked 7 November 2026:
+https://www.geoboundaries.org/api/current/gbOpen/LKA/ADM0/
+Pinned download:
+https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/LKA/ADM0/geoBoundaries-LKA-ADM0_simplified.geojson
+License:
+https://opendatacommons.org/licenses/odbl/1-0/
+https://www.openstreetmap.org/copyright
+
+The map is not cadastral data, an authoritative utility service territory, a
+current electrical network, or a live telemetry layer. All three site markers
+are fictional illustrative locations, not registered Sri Lankan plants.
