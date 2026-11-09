@@ -1,42 +1,34 @@
-# HANDOFF — read first, overwrite at end of session (≤40 lines)
+# HANDOFF
 
-**Updated:** 2026-11-04 · **By:** Claude Code · **Branch:** feat/pt-10-close (stacked chain, all pushed, no PRs yet)
+Updated: 2026-11-09 · Codex · chore/publish-ceylon-grid
 
-## Current state
+## Implemented
 
-- Plan `docs/tasks/PT-studio-look.md` done except **PT-7** (open, see Known limits).
-- One branch per task, each stacked on the previous one (merge in this order, each into `main`):
-  `feat/pt-1b-chamfered-lathe` (1b, 1d, 1c) → `feat/pt-3-clearcoat` → `feat/pt-2-softbox-studio` →
-  `feat/pt-4-ink-effect` → `feat/pt-5-editor-ink` (+ 1e) → `feat/pt-7-shader-warmup` → `feat/pt-6-village-ink` →
-  `feat/pt-8-size-ranges` → `feat/pt-9-render-checklist` → `feat/pt-10-close`.
-- `make check` green (2097 tests); shape report unchanged (IoU 0.98, edge F1 0.91, ΔE 3.4) at every step.
-- GPU audit (GTX 960M): draw calls 192 / 209 high, 143 / 148 low, unchanged; fps unchanged.
+- `/` -> `/lanka`; original lab routes preserved.
+- Operator: sourced country outline, synthetic pilot/scenarios, policy comparison,
+  finite pump scheduling, evidence, shared service notice, flexibility and audit.
+- `/customer`: scoped fixture account/bill explanation, service notice, participation.
+- Signed public demo personas; same-origin writes; version/session-bound confirmations.
+- SQLite event/audit persistence and transactional idempotent transitions.
+- Engine: interval replay verification with rebound and constrained finite scheduling.
+- EN UI, partial SI/TA drafts, existing lab catalogs unchanged.
+- Source attribution/license: apps/web/public/lanka/GEOGRAPHY_SOURCE.txt.
 
-## Next
+## Validation
 
-1. Open PRs for the chain (or one PR from `feat/pt-10-close`), review, merge.
-2. PT-7: profile the ~1.2 s long task when the village canvas mounts (forest / geometry build?), then tick.
+- Engine 359; web 2121 (6 skipped); bridge 21; integration 10 tests passed.
+- Full web suite needs NODE_OPTIONS=--no-experimental-webstorage on Node 26.
+- All workspace typechecks, focused lint, production build passed.
+- Two new browser tests passed; desktop/mobile (1440/390/320), dark/light inspected.
+- Manual scenarios LG1–LG11; docs/lanka-prototype.md contains setup and limits.
 
-## Files touched
+## Boundaries / next work
 
-- `vision-insert/utils/object-geometry.ts` (roundProfile, unitBevel, inset `unitExtrude`, prism, silhouette bevel)
-- `vision-insert/utils/surface-look.ts` (clearcoat, `surfaceMaterial`), `utils/studio-env.ts` (new)
-- `vision-insert/ui/object-editor-3d.tsx` (studio, composer + ink, warm-up fade)
-- `microgrid-3d/utils/ink-effect.ts`, `ui/ink.tsx`, `hooks/use-shader-warmup.ts` (new); `ui/post-effects.tsx`,
-  `ui/village-canvas.tsx`; `app/globals.css` (`--theme-scene-ink`)
-- `lib/object-kit.ts` (`ARCHETYPE_SIZE_MM`, `clampEstimatedDepth`), `server/perception/shape.ts`
-- `scripts/object-viewer-shot.mjs` (`SHOT_WIDTH`, `SHOT_LOG`), Makefile help
-- Docs: task file + Loop log, `performance.md` § 5, `design/3d-scene.md`, `design/tokens.md`,
-  `design/screens/village.md`, `.claude/skills/designer-3d/SKILL.md`. Scenarios V172–V180, T32 (local).
-
-## Decisions
-
-- Village ink: dark `scene-ink` token, silhouettes only, fade 22–45 units (text-primary + creases = white snow).
-- Editor ink: `text-primary` (light in dark theme), crease weight 1; tone mapping moved into the composer.
-- Prism bevel is an inset `unitExtrude` (bounds exact); no-bevel parts keep the old geometry.
-- PT-8 clamps only Spark's depth (parseKit / critic patch), as ratios to height and width.
-
-## Known limits
-
-- PT-7: warm-up doesn't remove the first-mount long task (1.18–1.22 s without vs 1.22–1.32 s with).
-- Light-theme editor ink is subtle on dark surfaces (dark on dark red); fine on the pale backdrop.
+- No utility telemetry, verified customer identity, live national models or forecasting.
+- Customer is responsive web, not native Android/iOS. No payments/CRM/voice integration.
+- Local SQLite adapter requires Node 22.13+ and writable disk; no Neon changes.
+- Personas are selectable by anyone; use synthetic data only. Production disabled.
+- Full master specification remains roadmap; first connected sandbox is complete.
+- Publication: six focused commits prepared for AKMaasif/Ceylon-Grid-Intelligence main.
+- Original 423-commit history preserved; upstream remote retained. No deployment/paid calls.
+- Previous upstream handoff archived at D:/CATALYST26/MITSINJO_ORIGINAL_HANDOFF.md.
