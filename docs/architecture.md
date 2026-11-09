@@ -1,5 +1,13 @@
 # Architecture
 
+## Lanka prototype extension
+
+`/` opens `/lanka`; `/customer` is a responsive web companion. Reference lab routes
+are retained. New feature: `features/lanka`; server sandbox modules: `server/lanka`;
+scoped API: `/api/lanka` and `/api/lanka/session`. Node SQLite is a local-only
+development adapter; no existing Neon schema changes. New engine calculation
+exports preserve the original hourly model. See `lanka-prototype.md` for boundaries.
+
 ## 1. Choice and why
 
 **Light monorepo: pnpm workspace + Turborepo, one app + one pure package.**

@@ -3,16 +3,17 @@
 Mockups are exported **once** to `design/stitch/` (committed) so agents read a local PNG (~1–2k tokens)
 instead of calling the Stitch MCP every time. Use the MCP only to generate, refresh or export.
 
-| Surface         | Route / scope         | Spec                       | Stitch screen id                 | Export                                          | Status                         |
-| --------------- | --------------------- | -------------------------- | -------------------------------- | ----------------------------------------------- | ------------------------------ |
-| Live Simulation | /simulation           | screens/live-simulation.md | 2cf782dffaed4ee69a889c7f4cbcb003 | `design/stitch/live-simulation.png` (+ `.html`) | exported                       |
-| Overview        | /overview             | screens/overview.md        | 060970653b394197a26b4e4997703260 | `design/stitch/overview.png` (+ `.html`)        | checked (built without mockup) |
-| Strategy Lab    | /strategies           | screens/strategy-lab.md    | bfbfa25691fe45f2b5af82216ceb242c | `design/stitch/strategy-lab.png` (+ `.html`)    | checked                        |
-| AI Copilot      | /copilot + side panel | screens/copilot.md         | b5ff63b413004edca491b83aadfe9f08 | `design/stitch/copilot.png` (+ `.html`)         | checked                        |
-| Scenarios       | /scenarios            | screens/scenarios.md       | d0c1f73e58cb428989306f98803e2a11 | `design/stitch/scenarios.png` (+ `.html`)       | checked                        |
-| Village editor  | /village              | screens/village.md         | —                                | none                                            | checked (built without mockup) |
-| App shell       | sidebar/header/panel  | shell.md                   | (from any screen)                | crop of `live-simulation.png`                   | exported                       |
-| UI kit          | components/ui         | components.md              | —                                | none (derive from screens)                      | —                              |
+| Surface         | Route / scope         | Spec                       | Stitch screen id                 | Export                                          | Status                                                  |
+| --------------- | --------------------- | -------------------------- | -------------------------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| Live Simulation | /simulation           | screens/live-simulation.md | 2cf782dffaed4ee69a889c7f4cbcb003 | `design/stitch/live-simulation.png` (+ `.html`) | exported                                                |
+| Overview        | /overview             | screens/overview.md        | 060970653b394197a26b4e4997703260 | `design/stitch/overview.png` (+ `.html`)        | checked (built without mockup)                          |
+| Strategy Lab    | /strategies           | screens/strategy-lab.md    | bfbfa25691fe45f2b5af82216ceb242c | `design/stitch/strategy-lab.png` (+ `.html`)    | checked                                                 |
+| AI Copilot      | /copilot + side panel | screens/copilot.md         | b5ff63b413004edca491b83aadfe9f08 | `design/stitch/copilot.png` (+ `.html`)         | checked                                                 |
+| Scenarios       | /scenarios            | screens/scenarios.md       | d0c1f73e58cb428989306f98803e2a11 | `design/stitch/scenarios.png` (+ `.html`)       | checked                                                 |
+| Village editor  | /village              | screens/village.md         | —                                | none                                            | checked (built without mockup)                          |
+| App shell       | sidebar/header/panel  | shell.md                   | (from any screen)                | crop of `live-simulation.png`                   | exported                                                |
+| UI kit          | components/ui         | components.md              | —                                | none (derive from screens)                      | —                                                       |
+| Lanka sandbox   | /lanka and /customer  | screens/lanka.md           | —                                | none                                            | checked (built without mockup; 1440/390/320 dark/light) |
 
 Stitch project id: `4259585850792174155` (Design System asset: `assets/d762353e27224da2a6e34c396b0f78df`).
 Status values: `not generated` · `generated` · `exported` · `implemented` · `checked` (passed /design-check).

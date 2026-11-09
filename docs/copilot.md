@@ -250,3 +250,10 @@ Synthetic evals (M12-T2, D2) live beside them in `eval.synthetic.json` (12 commi
 generated prompts through the same offline loop, each asserting its routed tool + the 4-section
 shape + `done`. Regenerate with `make gen-evals` (templates) or `make gen-evals-live COUNT=200`
 (Contributor, synthetic only).
+
+# Lanka prototype explanation boundary
+
+The new `/lanka` evidence panel and `/customer` bill explanation use deterministic
+templates, not live LLM calls. They do not grant customer access to the reference
+copilot's operator tools. Existing copilot routes remain independent. Live national
+investigation/customer orchestration require separate adapters and authorization.
