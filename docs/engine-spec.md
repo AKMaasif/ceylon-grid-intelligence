@@ -1,5 +1,14 @@
 # Engine spec — `packages/engine`
 
+## Lanka extension (hourly reference model preserved)
+
+`verifyFlexibility` integrates declared interval durations over a complete event
+and rebound window. Gaps, null observations, overlap and duplicates block results.
+Negative responses remain visible. It uses a synthetic fixture baseline, not causal
+measurement/settlement. `optimizeFlexibleSchedule` exhaustively evaluates contiguous
+starts for one fixed-power load within its allowed deadline. Rates are illustrative;
+it is not a national dispatch solver. Both return deterministic IDs/model versions.
+
 Simplified energy balance for demo/decision support. **Not** an engineering-grade power-flow simulator.
 Types: `docs/contracts.md`.
 

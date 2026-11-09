@@ -21,3 +21,4 @@ export * from './autonomy';
 export * from './constitution';
 export * from './chaos';
 export * from './benchmark';
+export * from './flexibility';
