@@ -1,6 +1,6 @@
 # HANDOFF
 
-Updated: 2026-11-09 · Codex · chore/publish-ceylon-grid
+Updated: 2026-11-09 · Codex · chore/independent-history
 
 ## Implemented
 
@@ -29,6 +29,6 @@ Updated: 2026-11-09 · Codex · chore/publish-ceylon-grid
 - Local SQLite adapter requires Node 22.13+ and writable disk; no Neon changes.
 - Personas are selectable by anyone; use synthetic data only. Production disabled.
 - Full master specification remains roadmap; first connected sandbox is complete.
-- Publication: seven focused commits prepared for AKMaasif/Ceylon-Grid-Intelligence main.
-- Original 423-commit history preserved; upstream remote retained. No deployment/paid calls.
+- Published history: credited source import, seven project commits, history documentation.
+- Original history retained locally in backup branch/bundle; upstream attribution/license intact.
 - Previous upstream handoff archived at D:/CATALYST26/MITSINJO_ORIGINAL_HANDOFF.md.

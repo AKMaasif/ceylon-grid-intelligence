@@ -83,7 +83,10 @@ and supported utility integrations. No real SCADA switching commands are exposed
 
 This project adapts [Mitsinjo Grid by Tokiarivelo](https://github.com/Tokiarivelo/mitsinjo-grid),
 starting from commit `1315ce9e8679be14da59ab73d64944afb64298b6`.
-The original Git history and [MIT license](LICENSE) are preserved. The original
+The [MIT license](LICENSE), original copyright notice and source attribution are preserved.
+This repository uses independent project history beginning with a clearly credited
+reference-source import, followed by Ceylon Grid Intelligence development commits.
+The original
 project's hackathon provenance and from-scratch claims describe that upstream work,
 not this derivative. Its README is archived [here](docs/reference/mitsinjo-grid-readme.md).
 
