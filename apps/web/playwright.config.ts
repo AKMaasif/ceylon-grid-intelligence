@@ -35,6 +35,8 @@ export default defineConfig({
     timeout: CI ? 300_000 : 60_000,
     env: {
       LLM_PROVIDER: 'mock',
+      // The production-mode local test server must explicitly enable synthetic personas.
+      LANKA_DEMO_ENABLED: 'true',
     },
   },
   projects: [

@@ -39,6 +39,19 @@ setup-claude: ## Install Claude Code settings + format hook (human, once)
 	@echo "Restart claude to apply."
 
 ##@ Develop
+dev-lanka: ## Run the Lanka web sandbox (open /lanka or /customer)
+	$(need_ws)
+	$(PNPM) --filter $(WEB) dev
+
+test-lanka: ## Test Lanka calculation, permissions and reviewed action workflow
+	$(need_ws)
+	$(PNPM) --filter $(ENGINE) exec vitest run src/__tests__/flexibility.test.ts
+	NODE_OPTIONS=--no-experimental-webstorage $(PNPM) --filter $(WEB) exec vitest run src/server/lanka src/features/lanka
+
+e2e-lanka: ## Test connected Lanka browser flow and responsive themes
+	$(need_ws)
+	$(PNPM) --filter $(WEB) exec playwright test e2e/lanka-connected.spec.ts
+
 dev: ## Run the web app in dev mode (port from PORT in .env, default 3000)
 	$(need_ws)
 	$(PNPM) dev
