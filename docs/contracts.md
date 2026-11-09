@@ -1,5 +1,16 @@
 # Contracts — single source of truth
 
+## Lanka sandbox extension
+
+`features/lanka/contracts.ts` defines demo session personas, versioned events and
+typed actions; `catalogue.ts` separates origin, kind, quality and freshness.
+`GET /api/lanka` returns operator synthetic results/catalogue/audit or only the
+customer's fixture account and eligible result. Unauthorized `account` queries fail.
+`POST /api/lanka` returns a signed preview, then commits its confirmed exact
+action/session/version transactionally. `POST/DELETE /api/lanka/session` manages
+public sandbox persona access. Writes require same origin; responses are no-store.
+See `lanka-prototype.md` for persistence and production limitations.
+
 Implement as Zod in `packages/engine/src/schemas/`; export inferred types from `index.ts`.
 Changing a field = update this file + schema + tests in the same commit.
 

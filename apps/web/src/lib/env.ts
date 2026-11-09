@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
+  LANKA_DEMO_ENABLED: z.enum(['true', 'false']).default('false'),
   LLM_PROVIDER: z.enum(['meta', 'glimmer', 'mock']).default('mock'),
   META_API_KEY: z.string().optional(),
   META_MODEL: z.string().optional(),
@@ -37,6 +38,7 @@ const envSchema = z.object({
 });
 
 export const env = envSchema.parse({
+  LANKA_DEMO_ENABLED: process.env.LANKA_DEMO_ENABLED || undefined,
   LLM_PROVIDER: process.env.LLM_PROVIDER || 'mock',
   META_API_KEY: process.env.META_API_KEY,
   META_MODEL: process.env.META_MODEL,

@@ -69,3 +69,5 @@ design/shots/
 *.swo
 .DS_Store
 Thumbs.db
+# Local-only Lanka sandbox database (contains synthetic identities and audit).
+**/.lanka-data/
