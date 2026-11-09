@@ -12,3 +12,5 @@ design/reference/
 *.jpeg
 *.svg
 **/.tmp*
+# Preserve the exact attributed upstream geography dataset; do not reformat vendor data.
+apps/web/public/lanka/sri-lanka.geojson
