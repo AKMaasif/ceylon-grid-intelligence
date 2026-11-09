@@ -1,0 +1,216 @@
+'use client';
+
+import { Award, Check, ShieldCheck, Zap } from 'lucide-react';
+import type { SectorConfig, SimulationResult, StrategyId } from '@mitsinjo/engine';
+import { cn } from '@/lib/utils';
+import { fmtKwh, fmtPct } from '@/lib/format';
+import { useTranslations } from '@/lib/i18n';
+import { Button } from '@/components/ui/button';
+import { EnergyBar } from '@/components/ui/energy-bar';
+import type { BestMetricFlags } from '../utils/summarize';
+
+export interface StrategyCardProps {
+  strategyId: StrategyId;
+  name: string;
+  rule: string;
+  result?: SimulationResult;
+  isActive: boolean;
+  bestMetrics?: Partial<BestMetricFlags>;
+  onSelectStrategy: () => void;
+  className?: string;
+  included?: boolean;
+  onToggleInclude?: () => void;
+  canExclude?: boolean;
+  /** Connected sectors to list (`connectedSectors(input)`), in engine order. */
+  sectors: readonly SectorConfig[];
+}
+
+export function StrategyCard({
+  strategyId,
+  name,
+  rule,
+  result,
+  isActive,
+  bestMetrics,
+  onSelectStrategy,
+  className,
+  included = true,
+  onToggleInclude,
+  canExclude = true,
+  sectors,
+}: StrategyCardProps) {
+  const tStrategies = useTranslations('strategies');
+  const tSectors = useTranslations('sectors');
+
+  const metrics = result?.metrics;
+  const hasResults = Boolean(result && metrics);
+
+  return (
+    <div
+      data-strategy={strategyId}
+      className={cn(
+        'flex flex-col justify-between p-5 rounded-card bg-surface border transition-all shadow-sm',
+        isActive
+          ? 'border-energy-cyan/60 ring-1 ring-energy-cyan/30 shadow-md shadow-energy-cyan/10'
+          : 'border-border/80 hover:border-border',
+        !included && 'opacity-65',
+        className
+      )}
+    >
+      <div>
+        {/* Top bar: Name + Active Badge + Comparison Checkbox */}
+        <div className="flex items-start justify-between gap-2 pb-3 border-b border-border/60">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-display text-base font-semibold text-text-primary tracking-tight">
+                {name}
+              </h3>
+              {isActive && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-energy-cyan/15 text-energy-cyan border border-energy-cyan/30">
+                  <Check className="h-3 w-3" aria-hidden="true" />
+                  {tStrategies('activeBadge')}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-text-secondary mt-1 leading-relaxed">{rule}</p>
+          </div>
+
+          {onToggleInclude && (
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs font-sans text-text-secondary shrink-0 pt-0.5 min-h-11 sm:min-h-0">
+              <input
+                type="checkbox"
+                checked={included}
+                disabled={included && !canExclude}
+                onChange={onToggleInclude}
+                className="h-4 w-4 rounded border-border text-energy-cyan focus:ring-energy-cyan cursor-pointer disabled:cursor-not-allowed"
+                aria-label={tStrategies('compareCheckbox', { strategy: name })}
+              />
+              <span className="text-[11px] font-medium hidden sm:inline">
+                {included ? tStrategies('inComparison') : tStrategies('notInComparison')}
+              </span>
+            </label>
+          )}
+        </div>
+
+        {/* 4 Compact Metric Tiles */}
+        <div className="grid grid-cols-2 gap-2.5 my-4">
+          {/* Delivered Energy */}
+          <div className="p-3 rounded-control bg-surface-elevated/70 border border-border/60 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-[11px] font-sans text-text-muted">
+                {tStrategies('delivered')}
+              </span>
+              {bestMetrics?.delivered && hasResults && (
+                <span className="text-[9px] font-mono text-battery-green bg-battery-green/15 border border-battery-green/30 px-1 py-0.5 rounded-control-sm flex items-center gap-0.5">
+                  <Award className="h-2.5 w-2.5" aria-hidden="true" />
+                  {tStrategies('badgeTop')}
+                </span>
+              )}
+            </div>
+            <span className="text-base font-display font-semibold text-text-primary mt-1 font-mono">
+              {fmtKwh(metrics?.servedKwh)}
+            </span>
+          </div>
+
+          {/* Essential Services Coverage */}
+          <div
+            className={cn(
+              'p-3 rounded-control border flex flex-col justify-between',
+              metrics && metrics.criticalUnservedKwh > 0.05
+                ? 'bg-critical-red/5 border-critical-red/30'
+                : 'bg-surface-elevated/70 border-border/60'
+            )}
+          >
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-[11px] font-sans text-text-muted">
+                {tStrategies('essentialCoverage')}
+              </span>
+              {bestMetrics?.essential && hasResults && (
+                <span className="text-[9px] font-mono text-battery-green bg-battery-green/15 border border-battery-green/30 px-1 py-0.5 rounded-control-sm flex items-center gap-0.5">
+                  <ShieldCheck className="h-2.5 w-2.5" aria-hidden="true" />
+                  {tStrategies('badgeBest')}
+                </span>
+              )}
+            </div>
+            <span
+              className={cn(
+                'text-base font-display font-semibold mt-1 font-mono',
+                metrics && metrics.criticalUnservedKwh > 0.05
+                  ? 'text-critical-red'
+                  : 'text-battery-green'
+              )}
+            >
+              {fmtPct(metrics?.criticalCoveragePct)}
+            </span>
+          </div>
+
+          {/* Unmet Demand */}
+          <div className="p-3 rounded-control bg-surface-elevated/70 border border-border/60 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-[11px] font-sans text-text-muted">{tStrategies('unmet')}</span>
+              {bestMetrics?.unmet && hasResults && (
+                <span className="text-[9px] font-mono text-battery-green bg-battery-green/15 border border-battery-green/30 px-1 py-0.5 rounded-control-sm">
+                  {tStrategies('badgeMin')}
+                </span>
+              )}
+            </div>
+            <span
+              className={cn(
+                'text-base font-display font-semibold mt-1 font-mono',
+                metrics && metrics.unservedKwh > 0.05 ? 'text-warning-amber' : 'text-text-muted'
+              )}
+            >
+              {fmtKwh(metrics?.unservedKwh)}
+            </span>
+          </div>
+
+          {/* Ending Battery SoC */}
+          <div className="p-3 rounded-control bg-surface-elevated/70 border border-border/60 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-[11px] font-sans text-text-muted">{tStrategies('socEnd')}</span>
+              {bestMetrics?.soc && hasResults && (
+                <span className="text-[9px] font-mono text-battery-green bg-battery-green/15 border border-battery-green/30 px-1 py-0.5 rounded-control-sm">
+                  {tStrategies('badgeMax')}
+                </span>
+              )}
+            </div>
+            <span className="text-base font-display font-semibold text-text-primary mt-1 font-mono">
+              {fmtPct(metrics?.socEndPct, 0)}
+            </span>
+          </div>
+        </div>
+
+        {/* One EnergyBar per connected sector (engine order and priority) */}
+        <div className="pt-2 border-t border-border/40 flex flex-col divide-y divide-border/30">
+          {sectors.map((sec) => {
+            const sm = metrics?.perSector[sec.id];
+            return (
+              <EnergyBar
+                key={sec.id}
+                label={tSectors(sec.id)}
+                valuePct={hasResults && sm ? sm.coveragePct : 0}
+                servedKwh={sm?.servedKwh}
+                demandKwh={sm?.demandKwh}
+                priority={sec.priority}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Footer: Use this strategy action */}
+      <div className="mt-5 pt-3 border-t border-border/60">
+        <Button
+          variant={isActive ? 'secondary' : 'primary'}
+          size="sm"
+          className="w-full"
+          disabled={isActive}
+          icon={isActive ? <Check className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
+          onClick={onSelectStrategy}
+        >
+          {isActive ? tStrategies('strategyActive') : tStrategies('useStrategy')}
+        </Button>
+      </div>
+    </div>
+  );
+}

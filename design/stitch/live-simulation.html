@@ -1,0 +1,524 @@
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mitsinjo Grid - Live Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed": "#002114",
+            "error-container": "#93000a",
+            "secondary-container": "#00b1c1",
+            "primary-fixed": "#ffddb4",
+            "tertiary-container": "#57daa4",
+            "on-background": "#dee2f5",
+            "surface": "#0e1320",
+            "inverse-surface": "#dee2f5",
+            "surface-dim": "#0e1320",
+            "surface-container-high": "#252a38",
+            "on-error": "#690005",
+            "outline": "#9e8e7c",
+            "surface-tint": "#ffb955",
+            "on-tertiary-fixed-variant": "#005237",
+            "secondary": "#50d8e8",
+            "on-surface-variant": "#d6c4af",
+            "secondary-fixed-dim": "#50d8e8",
+            "on-secondary-fixed": "#001f23",
+            "tertiary-fixed-dim": "#5bdda6",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#291800",
+            "outline-variant": "#514535",
+            "surface-container-lowest": "#090e1b",
+            "secondary-fixed": "#8ef2ff",
+            "surface-container-low": "#161b29",
+            "on-primary-fixed-variant": "#633f00",
+            "inverse-on-surface": "#2b303e",
+            "on-surface": "#dee2f5",
+            "inverse-primary": "#835500",
+            "surface-container-highest": "#303443",
+            "on-secondary-container": "#003e44",
+            "primary": "#ffd9ab",
+            "on-primary-container": "#704800",
+            "on-tertiary-container": "#005d3f",
+            "tertiary-fixed": "#79fac1",
+            "on-error-container": "#ffdad6",
+            "tertiary": "#76f7be",
+            "primary-container": "#ffb547",
+            "on-secondary": "#00363c",
+            "surface-bright": "#343948",
+            "background": "#0e1320",
+            "surface-variant": "#303443",
+            "primary-fixed-dim": "#ffb955",
+            "surface-container": "#1a1f2d",
+            "on-secondary-fixed-variant": "#004f56",
+            "on-primary": "#452b00",
+            "on-tertiary": "#003825"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-tablet": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xl": "2.5rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "space-md": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "telemetry-metric-lg": ["IBM Plex Mono"],
+            "telemetry-metric-md": ["IBM Plex Mono"],
+            "headline-lg-mobile": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "label-code": ["IBM Plex Mono"],
+            "label-micro": ["IBM Plex Mono"],
+            "body-md": ["Inter"],
+            "headline-sm": ["Space Grotesk"],
+            "title-md": ["Space Grotesk"],
+            "headline-md": ["Space Grotesk"],
+            "body-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "display": ["Space Grotesk"]
+          },
+          "fontSize": {
+            "telemetry-metric-lg": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "telemetry-metric-md": ["1.25rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-code": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.06em", "fontWeight": "500" }],
+            "label-micro": ["0.625rem", { "lineHeight": "0.875rem", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "fontWeight": "400" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "title-md": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0em", "fontWeight": "500" }],
+            "headline-md": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-sm": ["0.75rem", { "lineHeight": "1.125rem", "fontWeight": "400" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "display": ["3.5rem", { "lineHeight": "4rem", "letterSpacing": "-0.03em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-hidden selection:bg-secondary selection:text-on-secondary">
+<!-- SideNavBar Component -->
+<aside class="fixed top-0 left-0 h-screen w-58 z-40 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant flex flex-col justify-between py-4 px-3 select-none">
+<div>
+<div class="flex items-center gap-3 px-3 mb-6">
+<div class="w-8 h-8 rounded bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="solar_power">solar_power</span>
+</div>
+<div>
+<h1 class="text-title-md font-title-md font-semibold tracking-wider text-primary dark:text-primary">MITSINJO GRID</h1>
+<p class="text-label-micro font-label-micro text-on-surface-variant">VILLAGE TWIN v2.4</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<!-- Overview -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-normal text-body-md font-body-md hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150 cursor-pointer rounded-lg" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- Live Simulation (Active) -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-secondary dark:text-secondary bg-surface-container dark:bg-surface-container border-l-2 border-secondary dark:border-secondary font-medium text-body-md font-body-md rounded-r-lg" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="solar_power">solar_power</span>
+<span>Live Simulation</span>
+</a>
+<!-- Strategy Lab -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-normal text-body-md font-body-md hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150 cursor-pointer rounded-lg" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="science">science</span>
+<span>Strategy Lab</span>
+</a>
+<!-- Scenarios -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-normal text-body-md font-body-md hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150 cursor-pointer rounded-lg" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="history_toggle_off">history_toggle_off</span>
+<span>Scenarios</span>
+</a>
+<!-- AI Copilot -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-normal text-body-md font-body-md hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150 cursor-pointer rounded-lg" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="smart_toy">smart_toy</span>
+<span>AI Copilot</span>
+</a>
+</nav>
+</div>
+<div>
+<div class="px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-secondary animate-pulse" data-icon="sensors">sensors</span>
+<span class="text-label-code font-label-code text-on-surface-variant tracking-wider">SIMULATED DATA</span>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Component -->
+<header class="fixed top-0 left-58 right-0 h-[68px] z-30 bg-surface-container-lowest dark:bg-surface-container-lowest border-b border-outline-variant dark:border-outline-variant flex justify-between items-center px-6">
+<div class="flex items-center gap-6">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-primary font-bold">Live Simulation</h2>
+<p class="text-body-sm text-on-surface-variant">Explore the microgrid and see how changes impact the community.</p>
+</div>
+<div class="hidden xl:flex items-center gap-4 pl-6 border-l border-outline-variant/40">
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-lg border border-outline-variant">
+<span class="text-label-code font-label-code text-on-surface-variant">Scenario:</span>
+<select class="bg-transparent text-secondary font-label-code text-label-code border-none p-0 focus:ring-0 cursor-pointer">
+<option class="bg-surface">Baseline Village</option>
+<option class="bg-surface">Monsoon Heavy Cloud</option>
+<option class="bg-surface">Peak Community Surge</option>
+</select>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="text-label-code font-label-code text-emerald-400">SIMULATION COMPLETE</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface text-label-code font-label-code rounded-lg transition-all active:scale-95 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="restart_alt">restart_alt</span>
+<span>Reset</span>
+</button>
+<button class="px-3 py-1.5 bg-secondary/10 hover:bg-secondary/20 border border-secondary/30 text-secondary text-label-code font-label-code rounded-lg transition-all active:scale-95 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="smart_toy">smart_toy</span>
+<span>AI Copilot</span>
+</button>
+<div class="h-6 w-[1px] bg-outline-variant/50 mx-1"></div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="tune">tune</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors relative">
+<span class="material-symbols-outlined text-lg" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="fullscreen">fullscreen</span>
+</button>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant/50 mx-1"></div>
+<div class="flex items-center gap-2 pl-1">
+<div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center text-primary font-headline-sm text-sm">
+          JD
+        </div>
+<div class="hidden sm:block">
+<div class="text-body-sm font-medium text-on-surface">J. Dubois</div>
+<div class="text-label-micro text-on-surface-variant">Operator St. 04</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Workspace Canvas -->
+<main class="fixed top-[68px] left-58 right-0 bottom-0 flex overflow-hidden">
+<!-- 1. MASSIVE DOMINANT 3D VIEWPORT -->
+<div class="flex-1 relative bg-[#060a12] flex flex-col justify-between p-4 transition-all duration-300" id="viewport-container">
+<!-- Background / Isometric 3D Viewport Simulation Layer -->
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
+<!-- Grid Floor Lines -->
+<div class="absolute inset-0 bg-[linear-gradient(to_right,#161b29_1px,transparent_1px),linear-gradient(to_bottom,#161b29_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40"></div>
+<!-- Simulated Sunset Isometric Landscape Graphic representation -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative w-full h-full max-w-5xl max-h-[700px] flex items-center justify-center">
+<!-- Atmospheric Sun / Horizon Glow -->
+<div class="absolute top-12 right-24 w-64 h-64 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-600/5 blur-3xl pointer-events-none"></div>
+<!-- Connected Nodes SVG Lines -->
+<svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="lineGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#50d8e8" stop-opacity="0.8"></stop>
+<stop offset="100%" stop-color="#ffb547" stop-opacity="0.8"></stop>
+</lineargradient>
+</defs>
+<path class="animate-[pulse_3s_infinite]" d="M 250 350 L 400 280 L 550 340 L 700 260 L 500 450 Z" fill="none" stroke="url(#lineGrad)" stroke-dasharray="6 4" stroke-width="2"></path>
+<path d="M 400 280 L 450 180 L 600 220 Z" fill="none" stroke="#50d8e8" stroke-dasharray="4 4" stroke-width="1.5"></path>
+</svg>
+<!-- Interactive 3D Assets Placement Nodes -->
+<!-- PV Solar Array Node -->
+<div class="absolute top-[28%] left-[32%] transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-16 h-16 rounded-xl bg-surface-container border border-secondary/50 shadow-[0_0_20px_-4px_rgba(80,216,232,0.3)] flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-secondary text-2xl" data-icon="solar_power" style="font-variation-settings: 'FILL' 1;">solar_power</span>
+</div>
+<div class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-surface/90 backdrop-blur border border-outline-variant px-2.5 py-1 rounded-lg text-center whitespace-nowrap shadow-xl">
+<div class="text-label-micro text-secondary font-label-code">CENTRALE SOLAIRE</div>
+<div class="text-body-sm font-mono text-on-surface">+18.4 kW Active</div>
+</div>
+</div>
+<!-- BESS Battery Container Node -->
+<div class="absolute top-[42%] left-[52%] transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-16 h-16 rounded-xl bg-surface-container border border-tertiary/50 shadow-[0_0_20px_-4px_rgba(83,214,160,0.3)] flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-tertiary text-2xl" data-icon="battery_full" style="font-variation-settings: 'FILL' 1;">battery_full</span>
+</div>
+<div class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-surface/90 backdrop-blur border border-outline-variant px-2.5 py-1 rounded-lg text-center whitespace-nowrap shadow-xl">
+<div class="text-label-micro text-tertiary font-label-code">BATTERIE BESS</div>
+<div class="text-body-sm font-mono text-on-surface">78% SoC • 412V</div>
+</div>
+</div>
+<!-- Health Clinic Node -->
+<div class="absolute top-[24%] left-[64%] transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-16 h-16 rounded-xl bg-surface-container border border-rose-500/50 shadow-[0_0_20px_-4px_rgba(255,113,133,0.3)] flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-rose-400 text-2xl" data-icon="local_hospital" style="font-variation-settings: 'FILL' 1;">local_hospital</span>
+</div>
+<div class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-surface/90 backdrop-blur border border-outline-variant px-2.5 py-1 rounded-lg text-center whitespace-nowrap shadow-xl">
+<div class="text-label-micro text-rose-400 font-label-code">CENTRE DE SANTÉ (P1)</div>
+<div class="text-body-sm font-mono text-on-surface">3.2 kW • 100%</div>
+</div>
+</div>
+<!-- Village School Node -->
+<div class="absolute top-[60%] left-[38%] transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-14 h-14 rounded-xl bg-surface-container border border-primary-container/50 flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-primary-container text-xl" data-icon="school">school</span>
+</div>
+<div class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-surface/90 backdrop-blur border border-outline-variant px-2 py-0.5 rounded-lg text-center whitespace-nowrap shadow-xl">
+<div class="text-label-micro text-primary-container font-label-code">ÉCOLE</div>
+<div class="text-body-sm font-mono text-on-surface">1.5 kW</div>
+</div>
+</div>
+<!-- Water Tower Node -->
+<div class="absolute top-[55%] left-[68%] transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-14 h-14 rounded-xl bg-surface-container border border-secondary/50 flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="water_drop">water_drop</span>
+</div>
+<div class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-surface/90 backdrop-blur border border-outline-variant px-2 py-0.5 rounded-lg text-center whitespace-nowrap shadow-xl">
+<div class="text-label-micro text-secondary font-label-code">POMPE À EAU</div>
+<div class="text-body-sm font-mono text-on-surface">4.0 kW</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Top-Left Viewport HUD Camera & Mode Controls -->
+<div class="relative z-10 flex flex-wrap items-center gap-2">
+<div class="flex items-center bg-surface-container/80 backdrop-blur border border-outline-variant rounded-lg p-1">
+<button class="px-2.5 py-1 text-label-code font-label-code text-on-surface hover:text-secondary rounded transition-colors bg-surface">Vue Village</button>
+<button class="px-2.5 py-1 text-label-code font-label-code text-on-surface-variant hover:text-secondary rounded transition-colors">Centrale Solaire</button>
+<button class="px-2.5 py-1 text-label-code font-label-code text-on-surface-variant hover:text-secondary rounded transition-colors">Batterie BESS</button>
+<button class="px-2.5 py-1 text-label-code font-label-code text-on-surface-variant hover:text-secondary rounded transition-colors">Centre de Santé</button>
+<button class="px-2.5 py-1 text-label-code font-label-code text-on-surface-variant hover:text-secondary rounded transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="refresh">refresh</span>
+<span>Reset Caméra</span>
+</button>
+</div>
+<div class="flex items-center bg-surface-container/80 backdrop-blur border border-outline-variant rounded-lg p-1">
+<button class="px-3 py-1 text-label-code font-label-code bg-secondary text-on-secondary rounded font-bold">3D</button>
+<button class="px-3 py-1 text-label-code font-label-code text-on-surface-variant hover:text-on-surface rounded">2D</button>
+</div>
+</div>
+<!-- 2. DEDICATED 24H TIME CURSOR ('Curseur Temporel 24h') -->
+<div class="relative z-10 bg-surface-container/90 backdrop-blur-md border border-outline-variant rounded-xl p-4 shadow-2xl max-w-4xl mx-auto w-full mb-2">
+<div class="flex flex-col md:flex-row items-center justify-between gap-4">
+<!-- Transport Controls & Live Indicator -->
+<div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+<div class="flex items-center gap-1 bg-surface border border-outline-variant rounded-lg p-1">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="first_page">first_page</span>
+</button>
+<button class="p-1.5 bg-secondary text-on-secondary rounded transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="pause">pause</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="last_page">last_page</span>
+</button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+<span class="material-symbols-outlined text-amber-400 text-sm" data-icon="wb_sunny">wb_sunny</span>
+<span class="text-label-code font-label-code text-amber-300">14:00 • Pic Solaire (Daytime Solar Peak)</span>
+</div>
+</div>
+<!-- Timeline Scrubber & Milestones -->
+<div class="flex-1 w-full px-2">
+<div class="relative flex items-center">
+<input class="w-full h-2 bg-surface-bright rounded-lg appearance-none cursor-pointer accent-secondary" max="24" min="0" step="0.5" type="range" value="14"/>
+</div>
+<div class="flex justify-between text-label-micro font-label-micro text-on-surface-variant mt-1 px-1">
+<span>00h (Nuit)</span>
+<span>06h (Lever du soleil)</span>
+<span class="text-secondary font-bold">12h (Zénith)</span>
+<span>18h (Coucher)</span>
+<span>24h</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. COLLAPSIBLE RIGHT-SIDE TELEMETRY & CONTROLS DRAWER (~380px wide) -->
+<aside class="w-[380px] bg-surface-container-low border-l border-outline-variant flex flex-col z-20 transition-all duration-300 relative" id="right-drawer">
+<!-- Drawer Header & Collapse Toggle -->
+<div class="h-[52px] border-b border-outline-variant flex items-center justify-between px-4 bg-surface-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="monitoring">monitoring</span>
+<span class="text-title-md font-title-md text-on-surface font-semibold">Télémétrie &amp; Contrôles</span>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface rounded-lg transition-colors flex items-center gap-1 text-label-code font-label-code" id="drawer-toggle-btn">
+<span>Masquer / Réduire</span>
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- TAB NAVIGATION BAR (4 distinct category tabs) -->
+<div class="grid grid-cols-4 bg-surface border-b border-outline-variant text-center">
+<button class="py-2.5 px-1 text-label-micro font-label-micro text-secondary border-b-2 border-secondary font-bold bg-surface-container/50 flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-base" data-icon="analytics">analytics</span>
+<span>Métriques</span>
+</button>
+<button class="py-2.5 px-1 text-label-micro font-label-micro text-on-surface-variant hover:text-on-surface flex flex-col items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="tune">tune</span>
+<span>Contrôles</span>
+</button>
+<button class="py-2.5 px-1 text-label-micro font-label-micro text-on-surface-variant hover:text-on-surface flex flex-col items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="apartment">apartment</span>
+<span>Bâtiments</span>
+</button>
+<button class="py-2.5 px-1 text-label-micro font-label-micro text-on-surface-variant hover:text-on-surface flex flex-col items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="smart_toy">smart_toy</span>
+<span>Copilote IA</span>
+</button>
+</div>
+<!-- Drawer Content Scrollable Area -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Tab 1: 'Métriques' Content View -->
+<div class="space-y-4">
+<!-- 4 Compact Metric Cards Grid -->
+<div class="grid grid-cols-2 gap-3">
+<!-- Solar Generation -->
+<div class="bg-surface-container p-3 rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-1">
+<span class="text-label-micro text-on-surface-variant font-label-code">SOLAR GEN</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" data-icon="wb_sunny">wb_sunny</span>
+</div>
+<div class="text-telemetry-metric-md font-telemetry-metric-md text-primary">18.4 kW</div>
+<div class="text-label-micro text-emerald-400 mt-1 flex items-center gap-1">
+<span>↑ 98% cap</span>
+</div>
+</div>
+<!-- Battery State -->
+<div class="bg-surface-container p-3 rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-1">
+<span class="text-label-micro text-on-surface-variant font-label-code">BATTERY SOC</span>
+<span class="material-symbols-outlined text-tertiary text-sm" data-icon="battery_full">battery_full</span>
+</div>
+<div class="text-telemetry-metric-md font-telemetry-metric-md text-tertiary">78%</div>
+<div class="text-label-micro text-on-surface-variant mt-1">Charging +3.2kW</div>
+</div>
+<!-- Community Demand -->
+<div class="bg-surface-container p-3 rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-1">
+<span class="text-label-micro text-on-surface-variant font-label-code">DEMAND</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="bolt">bolt</span>
+</div>
+<div class="text-telemetry-metric-md font-telemetry-metric-md text-secondary">22.7 kW</div>
+<div class="text-label-micro text-emerald-400 mt-1">92% served</div>
+</div>
+<!-- Essential Services -->
+<div class="bg-surface-container p-3 rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-1">
+<span class="text-label-micro text-on-surface-variant font-label-code">SERVICES</span>
+<span class="material-symbols-outlined text-rose-400 text-sm" data-icon="local_hospital">local_hospital</span>
+</div>
+<div class="text-telemetry-metric-md font-telemetry-metric-md text-rose-400">96%</div>
+<div class="text-label-micro text-on-surface-variant mt-1">4/5 active</div>
+</div>
+</div>
+<!-- 24h Generation vs Demand composite chart container -->
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant">
+<div class="flex justify-between items-center mb-3">
+<span class="text-title-md font-title-md text-on-surface">Generation vs Demand</span>
+<span class="text-label-micro text-secondary font-label-code">LIVE 24H</span>
+</div>
+<!-- Simple SVG Chart Mockup -->
+<div class="h-32 w-full relative flex items-end">
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 300 100">
+<!-- Demand Line -->
+<path d="M 0 60 Q 75 40 150 30 Q 225 50 300 45" fill="none" stroke="#50d8e8" stroke-width="2"></path>
+<!-- Solar Generation Area -->
+<path d="M 0 90 L 0 90 Q 75 90 120 20 Q 180 20 220 90 L 300 90 Z" fill="url(#solarGradient)" opacity="0.3"></path>
+<path d="M 0 90 Q 75 90 120 20 Q 180 20 220 90 L 300 90" fill="none" stroke="#ffb547" stroke-width="2"></path>
+<defs>
+<lineargradient id="solarGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffb547" stop-opacity="0.8"></stop>
+<stop offset="100%" stop-color="#ffb547" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<div class="flex justify-between text-label-micro font-label-micro text-on-surface-variant mt-2 pt-2 border-t border-outline-variant/50">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span> Solaire</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> Demande</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary"></span> SoC %</span>
+</div>
+</div>
+<!-- Net Energy Balance Donut & Autarky -->
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant flex items-center justify-between">
+<div>
+<div class="text-label-micro text-on-surface-variant font-label-code">NET ENERGY BALANCE</div>
+<div class="text-telemetry-metric-lg font-telemetry-metric-lg text-primary mt-1">42.7 kWh</div>
+<div class="text-body-sm text-emerald-400 mt-1">Autarky Index: 94.2%</div>
+</div>
+<div class="w-16 h-16 rounded-full border-4 border-secondary border-t-transparent flex items-center justify-center font-mono text-sm text-secondary">
+              94%
+            </div>
+</div>
+<!-- Service Allocation Breakdown Bars -->
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant space-y-3">
+<div class="text-title-md font-title-md text-on-surface mb-2">Service Allocation</div>
+<div>
+<div class="flex justify-between text-body-sm mb-1">
+<span class="text-on-surface">Centre de Santé (P1)</span>
+<span class="font-mono text-secondary">3.2 kW (100%)</span>
+</div>
+<div class="w-full h-2 bg-surface rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-body-sm mb-1">
+<span class="text-on-surface">Pompe à Eau</span>
+<span class="font-mono text-secondary">4.0 kW (100%)</span>
+</div>
+<div class="w-full h-2 bg-surface rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-body-sm mb-1">
+<span class="text-on-surface">École &amp; Éclairage</span>
+<span class="font-mono text-secondary">1.5 kW (90%)</span>
+</div>
+<div class="w-full h-2 bg-surface rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 90%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Interactive script to toggle drawer collapse -->
+<script>
+    const drawer = document.getElementById('right-drawer');
+    const toggleBtn = document.getElementById('drawer-toggle-btn');
+    let isCollapsed = false;
+
+    toggleBtn.addEventListener('click', () => {
+      isCollapsed = !isCollapsed;
+      if (isCollapsed) {
+        drawer.style.width = '64px';
+        drawer.querySelectorAll(':not(#drawer-toggle-btn)').forEach(el => {
+          if(!el.contains(toggleBtn)) el.style.display = 'none';
+        });
+        toggleBtn.innerHTML = '<span class="material-symbols-outlined text-lg" data-icon="chevron_left">chevron_left</span>';
+      } else {
+        drawer.style.width = '380px';
+        drawer.querySelectorAll('*').forEach(el => el.style.display = '');
+        toggleBtn.innerHTML = '<span>Masquer / Réduire</span><span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>';
+      }
+    });
+  </script>
+</body></html>

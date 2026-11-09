@@ -1,0 +1,326 @@
+import { applianceMarkers, applianceTagState } from './appliance-markers';
+import { buildApplianceDerivations, type TapMode } from './tap-point';
+import {
+  activeFires,
+  breakerFromMode,
+  controllerModeAt,
+  SECTOR_IDS,
+  type SectorId,
+  type SimulationInput,
+  type SimulationResult,
+  type StrategyId,
+  type WeatherId,
+  type ScenarioEvent,
+} from '@mitsinjo/engine';
+import { criticalSectorIncidents } from '@/lib/dispatch-log';
+import type {
+  BuildingSceneModel,
+  BuildingStatus,
+  BatteryStatusColor,
+  BreakerState,
+  ControllerMode,
+  ControllerSceneModel,
+  FeederSceneModel,
+  LineFlowSceneModel,
+  SceneModel,
+  StatusColor,
+} from '../types';
+import { STATUS_HEX, TOKEN_HEX } from './scene-palette';
+
+// Site positions live in site-positions.ts (leaf: breaks the landscape/to-scene-model cycle).
+import {
+  BATTERY_POSITION,
+  BUS_POSITION,
+  FEEDER_EXIT_X,
+  FEEDER_EXIT_Z,
+  SECTOR_POSITIONS,
+  SOLAR_POSITION,
+  feederExitPosition,
+} from './site-positions';
+
+export {
+  BATTERY_POSITION,
+  BUS_POSITION,
+  FEEDER_EXIT_X,
+  FEEDER_EXIT_Z,
+  SECTOR_POSITIONS,
+  SOLAR_POSITION,
+  feederExitPosition,
+};
+
+/** Incoming terminal on the controller's back wall (cable from the battery hub). */
+export const BUS_INLET_POSITION: [number, number, number] = [
+  BUS_POSITION[0],
+  0,
+  BUS_POSITION[2] - 0.8,
+];
+
+/** SoC at or below this shows the battery as amber (visual threshold only). */
+export const BATTERY_WARNING_SOC_PCT = 30;
+
+export interface ToSceneModelOptions {
+  input: SimulationInput;
+  result?: SimulationResult | null;
+  timeIndex?: number;
+  isModified?: boolean;
+  strategy?: StrategyId;
+  /** Weather of the day shown. Default sunny (plain 24 h run). */
+  weather?: WeatherId;
+  placedModels?: Readonly<Record<string, { connectionMode?: TapMode }>>;
+  /**
+   * Events of the day shown (input events + that workflow day's). Default `input.events`.
+   * Fires reported on a multi-day run live on the days, not on the input.
+   */
+  events?: readonly ScenarioEvent[];
+}
+
+/**
+ * Pure mapping from simulation engine state to 3D scene visual model.
+ * Adheres strictly to P7-T1: zero energy math inside components.
+ */
+export function toSceneModel(options: ToSceneModelOptions): SceneModel {
+  const {
+    input,
+    result,
+    timeIndex = 12,
+    isModified = false,
+    strategy = 'proportional',
+    weather = 'sunny',
+  } = options;
+
+  const validTime = Math.max(0, Math.min(23, Math.floor(timeIndex)));
+  const step = result?.steps[validTime];
+  const timeLabel = `${validTime.toString().padStart(2, '0')}:00`;
+
+  // Sun & Daylight physics
+  const isDaytime = validTime >= 6 && validTime <= 18;
+  const sunElevation = isDaytime ? Math.sin(((validTime - 6) / 12) * Math.PI) : 0;
+  const sunIntensity = Math.max(0, sunElevation);
+
+  // 1. Solar model
+  const peakKw = input.solar.peakKw;
+  const currentSolarKw = step ? step.solarKw : 0;
+  const glowIntensity = peakKw > 0 ? Math.min(1, Math.max(0, currentSolarKw / peakKw)) : 0;
+  const isGenerating = currentSolarKw > 0.05;
+
+  const solar = {
+    position: SOLAR_POSITION,
+    peakKw,
+    currentKw: currentSolarKw,
+    glowIntensity,
+    isGenerating,
+  };
+
+  // 2. Battery model
+  const capacityKwh = input.battery.capacityKwh;
+  const socPct = step ? step.socPct : input.battery.initialSocPct;
+  const flowKw = step ? step.batteryKw : 0;
+  const isCharging = flowKw > 0.05;
+  const isDischarging = flowKw < -0.05;
+  const isIdle = !isCharging && !isDischarging;
+
+  let batteryColor: BatteryStatusColor = 'healthy';
+  if (socPct <= input.battery.minSocPct) {
+    batteryColor = 'critical';
+  } else if (socPct <= BATTERY_WARNING_SOC_PCT) {
+    batteryColor = 'warning';
+  }
+
+  const battery = {
+    position: BATTERY_POSITION,
+    capacityKwh,
+    socPct,
+    flowKw,
+    isCharging,
+    isDischarging,
+    isIdle,
+    statusColor: batteryColor,
+  };
+
+  // 3. Buildings & controller model (every engine sector)
+  const buildings = {} as Record<SectorId, BuildingSceneModel>;
+  const busToSectors = {} as Record<SectorId, LineFlowSceneModel>;
+  const feeders = {} as Record<SectorId, FeederSceneModel>;
+
+  // Daily peak served kW per sector from the engine result (P7-T1 / PL-T5: pure display divisor).
+  const maxServedBySector = {} as Record<SectorId, number>;
+  for (const sId of SECTOR_IDS) {
+    let maxKw = 0;
+    if (result) {
+      for (const st of result.steps) {
+        const sec = st.sectors[sId];
+        if (sec && sec.servedKw > maxKw) {
+          maxKw = sec.servedKw;
+        }
+      }
+    }
+    maxServedBySector[sId] = maxKw;
+  }
+  // Total the controller dispatches this hour (sum of sector feeders), for each feeder's share.
+  const dispatchedKw = step
+    ? SECTOR_IDS.reduce((sum, id) => sum + (step.sectors[id]?.servedKw ?? 0), 0)
+    : 0;
+
+  // Sectors burning at this hour (F1): engine fire events, shown as fire in 3D / 2D / circuit.
+  const burning = new Set(
+    activeFires(options.events ?? input.events, validTime).map((f) => f.sector)
+  );
+
+  // Critical alerts at this hour (PA-T4c): active fires and critical forecasted deficits
+  const inAlertSectors = new Set<SectorId>([
+    ...burning,
+    ...(result ? criticalSectorIncidents(input, result, validTime) : []).map((i) => i.sector),
+  ]);
+
+  for (const sectorId of SECTOR_IDS) {
+    const sectorConfig = input.sectors.find((s) => s.id === sectorId);
+    const priority = sectorConfig?.priority ?? 'medium';
+    const sectorStep = step?.sectors[sectorId];
+    const loadMultiplier = sectorConfig?.loadMultiplier ?? 1;
+    const connected = loadMultiplier > 0;
+
+    const demandKw = sectorStep ? sectorStep.demandKw : 0;
+    const servedKw = sectorStep ? sectorStep.servedKw : 0;
+    const unservedKw = Math.max(0, demandKw - servedKw);
+    // No result yet → no coverage to show (never default to "100%").
+    const coveragePct =
+      !sectorStep || !connected
+        ? null
+        : demandKw > 0
+          ? Math.round((servedKw / demandKw) * 100)
+          : 100;
+
+    let status: BuildingStatus = !connected ? 'disconnected' : sectorStep ? 'full' : 'unknown';
+    if (connected && sectorStep && demandKw > 0 && servedKw < demandKw - 0.05) {
+      status = servedKw > 0.05 ? 'partial' : 'unserved';
+    }
+
+    let statusColor: StatusColor = 'battery-green';
+    if (status === 'unknown' || status === 'disconnected') {
+      statusColor = 'idle';
+    } else if (status === 'partial') {
+      statusColor = 'warning-amber';
+    } else if (status === 'unserved') {
+      statusColor = 'critical-red';
+    }
+
+    const pos = SECTOR_POSITIONS[sectorId];
+
+    // Feeder dispatch model (PL-T5 / PL-T9 / PL-T12)
+    const maxKw = maxServedBySector[sectorId] ?? 0;
+    const intensity = maxKw > 0 ? Math.min(1, Math.max(0, servedKw / maxKw)) : 0;
+    const mode = !connected ? 'off' : (sectorStep?.mode ?? 'off');
+    const breaker: BreakerState = breakerFromMode(mode);
+
+    buildings[sectorId] = {
+      id: sectorId,
+      nameKey: `sectors.${sectorId}`,
+      position: pos,
+      priority,
+      demandKw,
+      servedKw,
+      unservedKw,
+      coveragePct,
+      status,
+      statusColor,
+      isCritical: priority === 'critical',
+      connected,
+      loadMultiplier,
+      intensity,
+      mode,
+      onFire: burning.has(sectorId),
+      inAlert: inAlertSectors.has(sectorId),
+    };
+
+    feeders[sectorId] = {
+      mode,
+      servedKw,
+      intensity,
+      share: dispatchedKw > 0.05 ? servedKw / dispatchedKw : 0,
+      breaker,
+    };
+
+    // Bus to building transmission line
+    const activeLine = servedKw > 0.05;
+    busToSectors[sectorId] = {
+      from: feederExitPosition(sectorId),
+      to: pos,
+      active: activeLine,
+      flowKw: servedKw,
+      direction: activeLine ? 'forward' : 'idle',
+      speed: Math.min(2.5, Math.max(0.5, servedKw / 5)),
+      color: STATUS_HEX[statusColor],
+      cut: burning.has(sectorId),
+    };
+  }
+
+  // Controller mode derived from engine SectorStep.mode & warnings (PL-T5, shared with hardware)
+  const controllerMode: ControllerMode =
+    result && step ? controllerModeAt(input, result, validTime) : 'normal';
+
+  const controller: ControllerSceneModel = {
+    mode: controllerMode,
+    feeders,
+  };
+
+  // 4. Intersite lines
+  const solarActive = currentSolarKw > 0.05;
+  const solarToBattery: LineFlowSceneModel = {
+    from: SOLAR_POSITION,
+    to: BATTERY_POSITION,
+    active: solarActive,
+    flowKw: currentSolarKw,
+    direction: solarActive ? 'forward' : 'idle',
+    speed: Math.min(2.5, Math.max(0.5, currentSolarKw / 10)),
+    color: TOKEN_HEX.solarAmber,
+  };
+
+  // Feeder from the solar/battery hub to the village bus carries what the engine
+  // served this hour (solar + battery discharge), so it always flows toward the bus.
+  const feederKw = step ? step.servedKw : 0;
+  const feederActive = feederKw > 0.05;
+  const batteryToBus: LineFlowSceneModel = {
+    from: BATTERY_POSITION,
+    to: BUS_INLET_POSITION,
+    active: feederActive,
+    flowKw: feederKw,
+    direction: feederActive ? 'forward' : 'idle',
+    speed: Math.min(2.5, Math.max(0.5, feederKw / 10)),
+    color: TOKEN_HEX.energyCyan,
+  };
+
+  const appliances = applianceMarkers(input.appliances, SECTOR_POSITIONS, validTime, result).map(
+    (m) => {
+      const mode = options.placedModels?.[m.id]?.connectionMode;
+      const tagged = { ...m, tag: applianceTagState(m, buildings[m.sector]) };
+      return mode ? { ...tagged, connectionMode: mode } : tagged;
+    }
+  );
+  const derivations = buildApplianceDerivations(appliances, buildings, {
+    placedModels: options.placedModels,
+  });
+
+  return {
+    timeIndex: validTime,
+    timeLabel,
+    sunElevation,
+    sunIntensity,
+    isDaytime,
+    isModified,
+    hasResult: Boolean(result && step),
+    strategy,
+    weather,
+    solar,
+    battery,
+    controller,
+    buildings,
+    appliances,
+    lines: {
+      solarToBattery,
+      batteryToBus,
+      busToSectors,
+      applianceDerivations: derivations.lines,
+      appliancePoles: derivations.poles,
+    },
+  };
+}

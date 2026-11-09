@@ -1,0 +1,201 @@
+import { z } from 'zod';
+import { AppliancesSchema } from './appliance';
+import { PrioritySchema, ScenarioIdSchema, SECTOR_IDS, SectorIdSchema } from './common';
+
+export const SectorConfigSchema = z.object({
+  id: SectorIdSchema,
+  label: z.string().min(1),
+  priority: PrioritySchema,
+  criticalShare: z.number().min(0).max(1),
+  profileKw: z.array(z.number().min(0)).length(24),
+  flexible: z.boolean(),
+  meterReadings: z.array(z.number().min(0)).length(24).optional(),
+  lifelineKw: z.number().min(0).optional(),
+  /**
+   * Load scaling of this sector's profile (× 0–3, default 1). 0 = not connected: no demand.
+   * Live "sector load" control; applied on top of the global `demandMultiplier`.
+   */
+  loadMultiplier: z.number().min(0).max(3).optional(),
+});
+export type SectorConfig = z.infer<typeof SectorConfigSchema>;
+
+export const BatteryConfigSchema = z
+  .object({
+    capacityKwh: z.number().min(1).max(2000),
+    initialSocPct: z.number().min(0).max(100),
+    minSocPct: z.number().min(0).max(100),
+    maxChargeKw: z.number().min(0).max(500),
+    maxDischargeKw: z.number().min(0).max(500),
+    chargeEff: z.number().min(0.5).max(1),
+    dischargeEff: z.number().min(0.5).max(1),
+  })
+  .refine((b) => b.minSocPct < b.initialSocPct, {
+    message: 'minSocPct must be strictly less than initialSocPct',
+    path: ['minSocPct'],
+  });
+export type BatteryConfig = z.infer<typeof BatteryConfigSchema>;
+
+export const SolarConfigSchema = z.object({
+  peakKw: z.number().min(0).max(500),
+  profile: z.array(z.number().min(0).max(1)).length(24),
+});
+export type SolarConfig = z.infer<typeof SolarConfigSchema>;
+
+const BaseSolarDropEventSchema = z.object({
+  type: z.literal('solar_drop'),
+  startHour: z.number().int().min(0).max(23),
+  durationH: z.number().int().min(1).max(24),
+  factor: z.number().min(0).max(3),
+});
+
+export const SolarDropEventSchema = BaseSolarDropEventSchema.refine(
+  (e) => e.startHour + e.durationH <= 24,
+  {
+    message: 'startHour + durationH must be <= 24',
+    path: ['durationH'],
+  }
+);
+export type SolarDropEvent = z.infer<typeof SolarDropEventSchema>;
+
+const BaseDemandSpikeEventSchema = z.object({
+  type: z.literal('demand_spike'),
+  sector: z.union([SectorIdSchema, z.literal('all')]),
+  startHour: z.number().int().min(0).max(23),
+  durationH: z.number().int().min(1).max(24),
+  factor: z.number().min(0).max(3),
+});
+
+export const DemandSpikeEventSchema = BaseDemandSpikeEventSchema.refine(
+  (e) => e.startHour + e.durationH <= 24,
+  {
+    message: 'startHour + durationH must be <= 24',
+    path: ['durationH'],
+  }
+);
+export type DemandSpikeEvent = z.infer<typeof DemandSpikeEventSchema>;
+
+/**
+ * Fire in a sector (F1, safety): the sector gets 0 kW from startHour for durationH hours, whatever the
+ * strategy, sector caps or lifeline floor say. Reported by an operator or a sensor, applied at once.
+ */
+const BaseFireEventSchema = z.object({
+  type: z.literal('fire'),
+  sector: SectorIdSchema,
+  startHour: z.number().int().min(0).max(23),
+  durationH: z.number().int().min(1).max(24),
+});
+
+export const FireEventSchema = BaseFireEventSchema.refine((e) => e.startHour + e.durationH <= 24, {
+  message: 'startHour + durationH must be <= 24',
+  path: ['durationH'],
+});
+export type FireEvent = z.infer<typeof FireEventSchema>;
+
+export const ScenarioEventSchema = z
+  .discriminatedUnion('type', [
+    BaseSolarDropEventSchema,
+    BaseDemandSpikeEventSchema,
+    BaseFireEventSchema,
+  ])
+  .refine((e) => e.startHour + e.durationH <= 24, {
+    message: 'startHour + durationH must be <= 24',
+    path: ['durationH'],
+  });
+export type ScenarioEvent = z.infer<typeof ScenarioEventSchema>;
+
+export const SectorCapSchema = z
+  .object({
+    sector: SectorIdSchema,
+    maxKw: z.number().min(0).max(500),
+    fromHour: z.number().int().min(0).max(23),
+    toHour: z.number().int().min(1).max(24),
+  })
+  .refine((c) => c.fromHour < c.toHour, {
+    message: 'fromHour must be strictly less than toHour',
+    path: ['toHour'],
+  });
+export type SectorCap = z.infer<typeof SectorCapSchema>;
+
+const BalancedWeightsShape = z.object({
+  critical: z.number().min(0).max(10),
+  high: z.number().min(0).max(10),
+  medium: z.number().min(0).max(10),
+  low: z.number().min(0).max(10),
+});
+
+export const BalancedWeightsSchema = BalancedWeightsShape.refine(
+  (w) => w.critical > 0 || w.high > 0 || w.medium > 0 || w.low > 0,
+  {
+    message: 'At least one balanced weight must be strictly positive',
+  }
+);
+export type BalancedWeights = z.infer<typeof BalancedWeightsSchema>;
+
+export const LifelineParamsSchema = z.object({
+  enabled: z.boolean(),
+});
+export type LifelineParams = z.infer<typeof LifelineParamsSchema>;
+
+export const StrategyParamsSchema = z.object({
+  balancedWeights: BalancedWeightsSchema.optional(),
+  lifeline: LifelineParamsSchema.optional(),
+});
+export type StrategyParams = z.infer<typeof StrategyParamsSchema>;
+
+export const SimulationInputSchema = z.object({
+  scenarioId: z.union([ScenarioIdSchema, z.literal('custom')]),
+  horizonH: z.literal(24),
+  stepH: z.literal(1),
+  solar: SolarConfigSchema,
+  battery: BatteryConfigSchema,
+  sectors: z
+    .array(SectorConfigSchema)
+    .length(SECTOR_IDS.length)
+    .refine(
+      (sectors) => {
+        const ids = new Set(sectors.map((s) => s.id));
+        return ids.size === SECTOR_IDS.length && SECTOR_IDS.every((id) => ids.has(id));
+      },
+      {
+        message: `Must contain exactly ${SECTOR_IDS.length} sectors with unique ids (${SECTOR_IDS.join(', ')})`,
+        path: ['sectors'],
+      }
+    ),
+  events: z.array(ScenarioEventSchema),
+  demandMultiplier: z.number().min(0.5).max(2),
+  sectorCaps: z.array(SectorCapSchema).optional(),
+  strategyParams: StrategyParamsSchema.optional(),
+  /** Appliances added to their sector's modelled load (PV). Absent = none. */
+  appliances: AppliancesSchema.optional(),
+});
+export type SimulationInput = z.infer<typeof SimulationInputSchema>;
+
+export const InputPatchSchema = z.object({
+  /** Replaces solar.profile (24 values 0–1), e.g. measured by the physical scale model (PH). */
+  solarProfile: z.array(z.number().min(0).max(1)).length(24).optional(),
+  solarDropPct: z.number().min(0).max(90).optional(),
+  dropStartHour: z.number().int().min(0).max(23).optional(),
+  dropDurationH: z.number().int().min(1).max(24).optional(),
+  demandMultiplier: z.number().min(0.5).max(2).optional(),
+  batteryCapacityKwh: z.number().min(1).max(2000).optional(),
+  initialSocPct: z.number().min(0).max(100).optional(),
+  minSocPct: z.number().min(0).max(100).optional(),
+  priorities: z.record(SectorIdSchema, PrioritySchema).optional(),
+  sectorCaps: z.array(SectorCapSchema).optional(),
+  meterReadings: z.record(SectorIdSchema, z.array(z.number().min(0)).length(24)).optional(),
+  criticalShares: z.record(SectorIdSchema, z.number().min(0).max(1)).optional(),
+  /** Per-sector load multiplier (× 0–3); 0 disconnects the sector (e.g. connect the factory live). */
+  sectorLoads: z.record(SectorIdSchema, z.number().min(0).max(3)).optional(),
+  balancedWeights: BalancedWeightsShape.partial().optional(),
+  lifeline: z
+    .object({
+      enabled: z.boolean().optional(),
+      kw: z.record(SectorIdSchema, z.number().min(0).max(2)).optional(),
+    })
+    .optional(),
+  /** Replaces the whole appliance list (PV); `[]` removes every appliance. */
+  appliances: AppliancesSchema.optional(),
+  /** Removes the fire events of these sectors (restore, M2-T4, approved via propose_change). */
+  clearFires: z.array(SectorIdSchema).min(1).optional(),
+});
+export type InputPatch = z.infer<typeof InputPatchSchema>;

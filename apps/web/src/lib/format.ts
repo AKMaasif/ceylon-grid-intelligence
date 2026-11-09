@@ -1,0 +1,119 @@
+/**
+ * Engineering number formatters for Mitsinjo Grid.
+ * Consistent precision, distinct kW vs kWh units, safe null/NaN handling.
+ */
+
+export const EMPTY_PLACEHOLDER = '—';
+
+/**
+ * Format active power in kilowatts (kW).
+ * e.g. fmtKw(40.23) => "40.2 kW"
+ */
+export function fmtKw(
+  kw: number | null | undefined,
+  decimals = 1,
+  fallback = EMPTY_PLACEHOLDER
+): string {
+  if (kw === null || kw === undefined || Number.isNaN(kw) || !Number.isFinite(kw)) {
+    return fallback;
+  }
+  return `${kw.toFixed(decimals)} kW`;
+}
+
+/**
+ * Format cumulative or step energy in kilowatt-hours (kWh).
+ * e.g. fmtKwh(124.56) => "124.6 kWh"
+ */
+export function fmtKwh(
+  kwh: number | null | undefined,
+  decimals = 1,
+  fallback = EMPTY_PLACEHOLDER
+): string {
+  if (kwh === null || kwh === undefined || Number.isNaN(kwh) || !Number.isFinite(kwh)) {
+    return fallback;
+  }
+  return `${kwh.toFixed(decimals)} kWh`;
+}
+
+/**
+ * Format percentages (0 - 100).
+ * e.g. fmtPct(98.52) => "98.5%"
+ */
+export function fmtPct(
+  pct: number | null | undefined,
+  decimals = 1,
+  fallback = EMPTY_PLACEHOLDER
+): string {
+  if (pct === null || pct === undefined || Number.isNaN(pct) || !Number.isFinite(pct)) {
+    return fallback;
+  }
+  return `${pct.toFixed(decimals)}%`;
+}
+
+/**
+ * Format hour index (0-23) to 24h clock string (e.g. 13 -> "13:00").
+ */
+export function fmtHour(hour: number | null | undefined): string {
+  if (hour === null || hour === undefined || Number.isNaN(hour)) {
+    return EMPTY_PLACEHOLDER;
+  }
+  const clamped = Math.max(0, Math.min(23, Math.floor(hour)));
+  return `${clamped.toString().padStart(2, '0')}:00`;
+}
+
+/**
+ * Format signed delta percentage (e.g. +12.4% or -40.0%).
+ */
+export function fmtDeltaPct(
+  delta: number | null | undefined,
+  decimals = 1,
+  fallback = EMPTY_PLACEHOLDER
+): string {
+  if (delta === null || delta === undefined || Number.isNaN(delta) || !Number.isFinite(delta)) {
+    return fallback;
+  }
+  const sign = delta > 0 ? '+' : '';
+  return `${sign}${delta.toFixed(decimals)}%`;
+}
+
+/**
+ * Format signed energy delta (e.g. +1.5 kWh or -6.0 kWh).
+ */
+export function fmtDeltaKwh(
+  delta: number | null | undefined,
+  decimals = 1,
+  fallback = EMPTY_PLACEHOLDER
+): string {
+  if (delta === null || delta === undefined || !Number.isFinite(delta)) {
+    return fallback;
+  }
+  const sign = delta > 0 ? '+' : '';
+  return `${sign}${delta.toFixed(decimals)} kWh`;
+}
+
+/**
+ * Format a bare number (unit shown separately, e.g. by MetricCard).
+ * e.g. fmtNum(40.23) => "40.2"
+ */
+export function fmtNum(
+  value: number | null | undefined,
+  decimals = 1,
+  fallback = EMPTY_PLACEHOLDER
+): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return fallback;
+  }
+  return value.toFixed(decimals);
+}
+
+/**
+ * Format a raw evidence value (number of unknown scale, or text) for display.
+ * Numbers keep at most `maxDecimals`, without trailing zeros; other values print as-is.
+ * e.g. fmtEvidence(10.640000000000002) => "10.64", fmtEvidence(3) => "3"
+ */
+export function fmtEvidence(value: unknown, maxDecimals = 2): string {
+  if (typeof value !== 'number')
+    return value === null || value === undefined ? EMPTY_PLACEHOLDER : String(value);
+  if (!Number.isFinite(value)) return EMPTY_PLACEHOLDER;
+  return String(Number(value.toFixed(maxDecimals)));
+}

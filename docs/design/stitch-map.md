@@ -1,0 +1,111 @@
+# Stitch mockup map — one row per screen/surface
+
+Mockups are exported **once** to `design/stitch/` (committed) so agents read a local PNG (~1–2k tokens)
+instead of calling the Stitch MCP every time. Use the MCP only to generate, refresh or export.
+
+| Surface         | Route / scope         | Spec                       | Stitch screen id                 | Export                                          | Status                         |
+| --------------- | --------------------- | -------------------------- | -------------------------------- | ----------------------------------------------- | ------------------------------ |
+| Live Simulation | /simulation           | screens/live-simulation.md | 2cf782dffaed4ee69a889c7f4cbcb003 | `design/stitch/live-simulation.png` (+ `.html`) | exported                       |
+| Overview        | /overview             | screens/overview.md        | 060970653b394197a26b4e4997703260 | `design/stitch/overview.png` (+ `.html`)        | checked (built without mockup) |
+| Strategy Lab    | /strategies           | screens/strategy-lab.md    | bfbfa25691fe45f2b5af82216ceb242c | `design/stitch/strategy-lab.png` (+ `.html`)    | checked                        |
+| AI Copilot      | /copilot + side panel | screens/copilot.md         | b5ff63b413004edca491b83aadfe9f08 | `design/stitch/copilot.png` (+ `.html`)         | checked                        |
+| Scenarios       | /scenarios            | screens/scenarios.md       | d0c1f73e58cb428989306f98803e2a11 | `design/stitch/scenarios.png` (+ `.html`)       | checked                        |
+| Village editor  | /village              | screens/village.md         | —                                | none                                            | checked (built without mockup) |
+| App shell       | sidebar/header/panel  | shell.md                   | (from any screen)                | crop of `live-simulation.png`                   | exported                       |
+| UI kit          | components/ui         | components.md              | —                                | none (derive from screens)                      | —                              |
+
+Stitch project id: `4259585850792174155` (Design System asset: `assets/d762353e27224da2a6e34c396b0f78df`).
+Status values: `not generated` · `generated` · `exported` · `implemented` · `checked` (passed /design-check).
+
+## Reference visual assets (Ground truth)
+
+- Master Village Sunset Reference: `design/reference/Mitsinjo Grid_ Village at Sunset.png`
+- Master Dashboard Mockup: `design/reference/tableau-de-bord-solaire-futuriste.png`
+- Village 3D & 2D Schematic: `design/reference/village-3d-2d-schema.jpg`
+- Village 3D Viewport Crop: `design/reference/village-viewport-reference.png`
+- Village 2D Circuit Schema: `design/reference/village-2d-schema.jpg`
+
+## Precedence when sources disagree
+
+1. `docs/contracts.md` + engine data (what values exist) — never fake a field to match a mockup.
+2. `docs/design/*.md` rules (color semantics, labels, states, a11y, "no fake controls").
+3. Stitch mockup (layout, spacing, hierarchy, visual feel).
+   Record each deviation from the mockup in the Notes below with a one-line reason.
+
+## Notes / deviations
+
+- Overview: no telemetry strip (temp, RH, DNI, sync, grid V) — engine has no such fields (precedence 1).
+- Overview: no AI optimization panel — AI text lives only in copilot components; a computed InsightCard is used instead.
+- Overview: 2-column Bento Command Center (col-span-7 Left / col-span-5 Right). Docked 4-stat Energy Balance summary strip sits directly beneath the 3D digital twin viewport; 24h telemetry chart underneath; right column hosts Service Allocation hierarchy and computed Scenario Impact / Copilot insights. No fake weather telemetry (precedence 1).
+- Overview 2026-10-30: rebuilt as an "Incident" screen, built without mockup (old export = dashboard). Hackathon rules list "dashboards as the main feature" as an anti-project: KPI cards, 24h chart and sector list removed; hero alert + impact tiles + strategy rings + twin. Gate-out 1440/390 dark/light ✓, no overflow.
+- Strategy Lab: decision summary sits above the cards (read before comparing) instead of bottom-right; no "Recommended" ribbon — the summary's "Use this strategy" action plays that role.
+- Live Simulation 3D: look follows `design/reference/Mitsinjo Grid_ Village at Sunset.png` (stylized low-poly, not photoreal; no in-scene text such as the "École" sign, i18n rule). Golden-hour light by day, night by night: the reference's permanent sunset would hide the time-of-day signal.
+- Strategy Lab: no fixed-inputs tile strip; scenario, PV and battery are one line under the title (values from `input`).
+- Strategy Lab: comparison is one grouped Recharts bar chart, not per-metric bar rows; mixed units are labelled in the card header.
+- Gate-out 2026-10-27 (after PR #3 fixes): sidebar status badges wrap inside the sidebar; EnergyBar header wraps in narrow cards.
+- /village 2026-10-31 (built without mockup): live village preview (3D / 2D) in the right column; scenery objects lighter fill + « No load » chip; one colour per object (box + list border, user request); « Add to the simulation » form built without mockup (PV-T11/T12).
+- /village 3D model block 2026-10-31 (PV-T10, built without mockup): small viewer `h-60 sm:h-72` inside the aside, not the `min-h-[360px]` scene viewport (it previews one object, not the village); since 2026-11-01 no photo on the model (user): recipe = measured-colour parts, silhouette = plain extrusion. Gate-out 1440 + 390, dark + light, routes stubbed with the offline fixtures.
+- /village 3D viewer light 2026-11-01 (PR-1.1): image-based studio light (`RoomEnvironment`), key + rim, contact shadow; Khronos Neutral tone mapping instead of the plan's ACES (keeps measured colours); fixed double sRGB→linear on vertex colours (models were darker / more saturated than the photo). Gate-out: `make shape-shots` viewer shots, dark + light; layout unchanged so no new page shots. PR-1.2/1.3/1.4: rounded boxes, roof overhang, procedural relief per material (same gate).
+- /village PG-T18 improvement chip 2026-11-02 (built without mockup): overlay at the bottom of the 3D viewer, `max-w-xs`, violet border (AI) / amber when stopped, spinner + « Improving: stage n/4 — <stage> », 1 px progress bar (`role=progressbar`), stage score before → after (mono, `fmtPct`), final « Model finalised » / « Improvement stopped: <cause> » fades after 4 s; sibling of the `role=img` viewer so `aria-live=polite` is announced; tokens only (`bg-surface/90`, `ai-violet`, `solar-amber`, `battery-green`), truncates at 320 px. Gate-out 2026-11-03 `make improve-shot` (stubbed job, 1440×900 + 390×844, dark + light): spinner, bar and finalised state readable in both themes, no overflow at 390 px; on mobile the chip covers the plinth while it runs (accepted: transient). Cause `lost` when the server forgot the job (restart).
+- /village PV-T11b 2026-11-02 (built without mockup): 24 h engine-curve bars under the insert preview line; viewer size slider 50–200 % + tint picker + reset under the 3D canvas (visual only). Gate-out static only: sandbox blocks the dev server (Next `uv_interface_addresses` crash) and the live :3001 is out of reach — tokens-only styling, wrapping rows, ≥ 44 px targets, sr summaries; live screenshots pending on the operator's machine.
+- Autonomous AI Dispatch & Scenario Drafting 2026-11-03 (PA): built without mockup, following design system tokens and responsive rules. 3-level dispatch toggle (header, sidebar, mobile, card), permanent 'AI IN CONTROL' badge (ai-violet), min-44px 'Take back control' button, tab 5 Event Log panel with severity/type/sector filters and export, Shift Report dialog with counterfactual impact, and chat ScenarioDraftCard with day weather/events, missing slot response pills, and engine preview. Checked on desktop (1440px), tablet (1024px), mobile (390px, 320px), dark and light modes, zero horizontal overflow.
+- Gate-out P5 2026-10-27: Live Simulation features interactive village topology + timeline scrubber + BuildingInspectorPanel + SimControls inline with Zod validation. Scenarios library provides 5 synthetic scenario cards, assumptions inspector, and latest-run reproducibility summary with JSON and markdown exports. Both screens pass 1440x900 screenshot gate with 100% i18n parity.
+- Gate-out P6 2026-10-27: AI Copilot features two-column operational deck on /copilot and 360px panel mode across all screens. Includes structured ChatMessage (What happened, Computed evidence, Why it matters, Explore next), ToolActivity bar, interactive ConfirmProposalDialog with diff preview and operator approve/reject, suggested prompt chips, and neutral computed ContextPanel. In context panel: no fake temperature/humidity/irradiance since engine has no weather sensors (precedence 1); canonical input parameters shown instead. Matches 1440x900 screenshot gate with 100% i18n parity.
+- Gate-out P7 2026-10-27: 3D Microgrid digital twin on /simulation with smooth OrbitControls, 4 camera presets (Village, Solar, Battery, Essential), reset camera button, 5 canonical sector buildings with HTML status badges, BESS battery container with 5-bar LED gauge, solar array with emissive glow, overhead lines with catenary curves and animated energy flow. Overview features compact 3D/2D digital twin preview. Both support SSR fallback and graceful WebGL-unavailable 2D topology fallback without crashes. Matches 1440x900 screenshot gate with 100% i18n parity.
+- Gate-out P7 3D 2026-10-27: `make scene-audit` → `design/shots/{simulation,overview}-3d.png` (SwiftShader WebGL). Scene matches canonical layout; 97 draw calls, 6.2k triangles. Deviation: sector mirror bar is a single scrollable row above the hint (was overlapping it).
+- Live Simulation Redesign 2026-10-27 (Screen `2cf782dffaed4ee69a889c7f4cbcb003`): 3D microgrid digital twin expanded to dominant centerpiece (~75% width, full height). Secondary dashboard cards consolidated into collapsible right drawer (380px) organized into 4 category tabs (Métriques, Contrôles, Bâtiments, Copilote IA). 24h Time Cursor ('Curseur Temporel 24h') kept permanently docked outside tabs at bottom of 3D viewport.
+- PX/PY 2026-10-27 (PR #15): no mockup for stretch elements. ImpactBanner `ANOMALY_TO_VERIFY` (ai-violet, "to verify" wording) and `SECTOR_CAPPED` (energy-cyan); SimControls "Sector priorities & caps" row; cap badge in AssumptionsInspector; priority/cap rows in ConfirmProposalDialog diff. Existing tokens only; cap values via i18n `common.capRange`. Screenshot gate not run.
+- Strategy Lab parameters 2026-10-28 (PZ phase 1): built without mockup by owner decision, design system only.
+  `StrategyParamsPanel` above the decision summary; checked 1440×900, 390×844 and 320 px, dark and light, no horizontal overflow.
+- EMS dispatch feeders 2026-10-29: 3D badge moved in front of the shelter, below roof level (it hid the battery); sector cables leave from 6 roof risers; kW tag on each cable; share bar (one segment per sector) in the 3D badge and both 2D EMS cards. Topology: hub → EMS → bus. Circuit: bus bar + breakers inside a dashed EMS switchboard frame, kW tag per feeder. Controller camera moved to [-2, 8.5, 11.5] (closer view made labels huge). Legacy hub transformer/mast removed from `terrain.tsx`.
+- PR #28 follow-ups 2026-10-30: 3D EMS badge re-anchored (centered on the shelter front at breaker height, same scale as the other building labels) instead of hanging below the pad. 2D Topology/Circuit: zoom/pan + full screen; HUD clearance fixed (`sm:p-4` used to override the top/bottom padding, so the legend overlapped the hint). Checked 1440×900 and 390×844.
+- Weather workflow 2026-10-28: built without mockup (no Stitch screen). `WeatherWorkflowPanel` in Controls tab + `DayStrip` above the timeline, reusing strategy-button selected style as rounded pills. Checked 1440×900 and 390×844, dark and light, no horizontal overflow.
+- EMS Dispatch Controller 2026-10-29 (PL phase 2): built with design system tokens and canonical 3D low-poly technical shelter at BUS_POSITION [0, 0, 1]. Controller card in 2D topology and circuit diagram with breaker + current limiter symbol; camera preset 'controller'; 100% i18n key parity across EN, FR, MG; checked 1440×900, 390×844 and 320 px, dark and light, no horizontal overflow.
+- Strategy Lab survival floors 2026-10-30 (PL-T17): built without mockup, same pattern as the critical-shares block
+  (sector caption + `SimControl` per sector). Checked 1440×900 and 390×844, dark and light, no horizontal overflow.
+- Live Simulation scale-model panel 2026-10-30 (PH-H4): built without mockup, same card pattern as Weather Workflow;
+  label–value rows (2 columns were too tight in the side panel). Checked with a live bridge at 1440×900 and 390×844,
+  dark and light, no horizontal overflow.
+- Chat UX 2026-10-30: no mockup. Proposal card container-based (stacked buttons in the panel), decision lock + decision
+  message (battery-green), amber fallback note, one-line suggestions, mic inline errors. Panel header wraps.
+  Gate-out: /simulation copilot tab 1440 + 390, dark + light, no horizontal overflow.
+- M1-T2 2026-10-30: no mockup. Clinic guard block in ConfirmProposalDialog: critical-red/10 bg, critical-red border
+  (50 % → solid when armed), ShieldAlert icon, reason list; Approve button `danger`. Existing tokens only.
+- M1-T1 2026-10-30: no mockup. ConfirmProposalDialog gains an "Engine calculation" block (`proposal-impact.tsx`): energy-cyan border like Computed evidence, grid table Before / After / Change; on < sm the label takes its own line above the 3 values. Negative change `critical-red`, positive `battery-green`. Gate-out: dialog screenshots 1440 + 390, dark + light, no horizontal overflow.
+- Copilot voice spectrum 2026-10-30: built without mockup. Violet because the audio goes to an AI model (Meta Voice); bars updated by refs in `requestAnimationFrame` only while recording.
+- Full screen glass panels 2026-10-30: built without mockup. Copilot terminal (right) + controls drawer (left) as
+  `GlassPanel`, docked timeline as glass with a minimize bar; 2D diagram padded between panels and above the dock.
+  Checked 1440×900 (Circuit dark + light, 3D dark) and 390×844 (Circuit dark), no horizontal overflow.
+- M1-T5 2026-10-31: no mockup. Proposal card rows gain a checkbox (whole row is the label, ≥ 44 px) and a hint line;
+  « Not applied (unchecked) » list on decided cards. Same tokens as the existing diff rows.
+- Fire alarm 2026-10-31 (M2-T2/T3): no mockup. Red alert banner (page + compact in the viewport), snackbars bottom right,
+  « Report a fire » in the HUD and the deck, 2D « On fire » card, 3D flames + smoke. Critical-red tokens only. Not screenshotted yet.
+- Vision detection dialog 2026-10-31 (PV-T7): built without mockup. Bottom sheet (mobile) / card (≥ sm) over the copilot,
+  photo with cyan outlines, amber selection, list below. Gate-out: /copilot 1440 + 390, dark + light, `/api/vision` stubbed
+  with the mock fixture, no horizontal overflow. Category text hidden when it repeats the label.
+- Village editor 2026-10-31: built without mockup, new menu entry (sidebar + 6th MobileNav item, scan icon). Intro card +
+  SIMULATED badge, dashed drop zone (Choose a photo / Use the sample room), then photo canvas + « Selected appliance » aside
+  (320 px, stacks under on < lg). Gate-out 1440 + 390, dark + light, empty and with detections, no horizontal overflow.
+- Draw missing objects 2026-10-31 (PV-T8): built without mockup. Secondary button under the photo; amber dashed shapes with
+  4 square corner handles on the selected one; panel in cyan tint (3-tool segmented control, one row per shape with free text
+  and trash, Add a box / Clear all / Cancel / Send). Gate-out 1440 dark + 390 light, `/api/vision` stubbed, no horizontal overflow.
+- Sidebar fold 2026-10-31: no mockup; 64 px icon rail on xl+ (shell.md « Fold »).
+- M2-T4 2026-11-02: no mockup. `clearFires.<s>` row in ConfirmProposalDialog (same row pattern + tokens as the other diff lines); « Report a fire » (existing `ReportFireControl`, hud) in the chat header, full + panel modes. Gate-out static only (sandbox blocks the dev server): no new styling, wraps on 390 px, ≥ 44 px targets; live screenshots + A102–A104 pending on the operator's machine.
+- M3-T3 2026-11-02: no mockup. Voice preset on the existing fire list: highlighted row (`critical-red` ring, existing tokens) + one caption line. Gate-out static only (sandbox); live mic check (A105) pending on the operator's machine.
+- M3-T4 2026-11-02: no pixels moved (readout voice choice only). Live listening check (A106) pending on the operator's machine.
+- M3-T5 2026-11-02: no mockup. Hands-free toggle next to the mic (existing `ICON_BUTTON` pattern, cyan active state). Gate-out static only (sandbox); live talkie-walkie check (A107) pending on the operator's machine.
+- M4-T4 2026-11-02: no mockup. Perception IA block: 3rd style (violet tint, existing tokens), editable values, sector select, propose → usual dialog. Gate-out static only (sandbox); dark/light + mobile check (A108) pending on the operator's machine.
+- M5-T2 2026-11-02: no mockup. Visual card mirrors the generated-image card (same pattern + tokens) with an ai-violet « Généré par IA » badge; opens the existing lightbox. Gate-out static only (sandbox); live /copilot check pending on the operator's machine.
+- M5-T3 2026-11-02: no mockup. Shedding poster block: number-free picture + engine cut hours in an HTML overlay (FR/MG/EN), canvas PNG export, 44 px export button. Gate-out static only (sandbox); live /copilot check pending on the operator's machine.
+- M7-T1 2026-11-02: no mockup. Council bubbles mirror the evidence-block pattern (existing tokens): one bubble per voice with engine badges (own served Δ, unserved after), cyan ring + badge on the picked voice, violet mediator verdict. Gate-out static only (sandbox); live /copilot check pending on the operator's machine.
+- M8-T1 2026-11-02: no mockup. Segment perception block shows the count + "view on photo" (existing button pattern); the lightbox overlays masks as a 0–1 SVG layer (outline preferred, box fallback), same space as the vision-insert overlays, cyan like the inspector grid. Gate-out static only (sandbox); live check pending on the operator's machine.
+- M8-T3 2026-11-02: no mockup. Smoke/fire observations add a red "report" button in the perception block (same button pattern, critical-red); it only opens the existing sector dialog — the operator picks the sector, nothing auto-cuts. Gate-out static only (sandbox); live scenario A109 pending on the operator's machine.
+- M10-T1 2026-11-02: autopilot deck card under the fire control (toggle + suggestion + history), built from existing card/button patterns and tokens (no new mockup section). Gate-out static only (sandbox); live /simulation check pending on the operator's machine.
+- M10-T2 2026-11-02: no mockup. Constitution card under the autopilot card (same card pattern + tokens): default rules in plain words + verified-by-code note; the autopilot gate is pure code (no new UI states). Gate-out static only (sandbox); live /simulation check pending on the operator's machine.
+- M10-T3 2026-11-02: no mockup. Envelope section on the autopilot card (same switch pattern + tokens): two permission switches off by default, `accepted · auto` badge in history. Gate-out static only (sandbox); live /simulation check pending on the operator's machine.
+- M10-T4 2026-11-02: no mockup. Meeting uploader card above the context panel (full /copilot only, same card pattern + tokens); meeting block in chat mirrors the violet perception-block style (turns, who-wants-what, propose button → usual dialog). Gate-out static only (sandbox); live scenario A110 pending on the operator's machine.
+- M12-T1 2026-11-02: no mockup. Laterite grain multiplies the vertex-colored ground (palette kept) + rice paddy parcel west of the pond; tôle roofs already procedural (corrugated). AI images were look targets only, never shipped: both textures are seeded 128 px canvas (0 download, +1 draw call, inside perf budget). Gate-out static only (sandbox); live /simulation check pending on the operator's machine.
+- M12-T3 2026-11-02: no mockup. Day comic block mirrors the poster block (same pattern + tokens): 4-panel strip + engine hour/state rows + PNG export. Gate-out static only (sandbox); live scenario A111 pending on the operator's machine.
+- M2-T3 2026-11-02: no mockup. Burning sector line carries `cut` in the scene model; 3D red break octahedron at the cable midpoint (1 draw call per fire, critical-red token, no electrons), 2D wire already showed `cut`. Smoke/flames were already instanced and budgeted. Gate-out static only (sandbox); live /simulation fire check pending on the operator's machine.
+- PI-T2 2026-11-03: no mockup (3D scene only). Placed object models replace the box marker; slope plinth uses `MARKER_PLINTH_HEX`, states reuse the marker dimming. Gate-out live on /village + /simulation, 1440 + 390 (`design/shots/{simulation,village}-placed-model{,-mobile}.png`): mobile single column, no overflow. Deviation: at the default ring position a 1 m fridge sits among the houses and is hard to see; free placement away from buildings is PI-T3.
+- /simulation PT-11 2026-11-04 (no new mockup: reuses the checked building badge): inserted object badge = `SceneBadge` shared with buildings (icon, name, status dot, sector priority · kW). Deviation: badge scale × 0.6 (`APPLIANCE_FOCUS_SCALE`) so a focused object reads like a focused building. Gate-out 1440×900 + 390×844, dark + light (sample room fridge): matches; at 390 px a focused badge can sit under the floating HUD, as the buildings' already did.

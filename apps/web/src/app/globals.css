@@ -1,0 +1,176 @@
+@import 'tailwindcss';
+
+:root {
+  --theme-canvas: #080d1a;
+  --theme-canvas-raised: #0d1526;
+  --theme-canvas-sunken: #050811;
+  --theme-surface: #111d30;
+  --theme-surface-elevated: #17253a;
+  --theme-surface-hover: #1c2d45;
+  --theme-border: #26364d;
+  --theme-border-strong: #3b506b;
+  --theme-text-primary: #f4f7fb;
+  --theme-text-secondary: #a8b6c9;
+  --theme-text-muted: #72839a;
+  --theme-solar-amber: #ffb547;
+  --theme-energy-cyan: #50d8e8;
+  --theme-network-blue: #729cff;
+  --theme-battery-green: #53d6a0;
+  --theme-ai-violet: #b6a0ff;
+  --theme-warning-amber: #ffcb70;
+  --theme-critical-red: #ff7185;
+  /* Per-object mark colours (vision boxes): hue per object, saturation + lightness per theme. */
+  --theme-mark-s: 85%;
+  --theme-mark-l: 64%;
+  /* 3D object viewer backdrop: lighter than most objects (black TVs, dark pumps) in the dark theme. */
+  --theme-viewer-center: #7d8ba0;
+  --theme-viewer-edge: #3a4659;
+  /* Ink outline of the village scene (PT-6): dark in both themes, over grass, roofs and sky. */
+  --theme-scene-ink: #0b1220;
+}
+
+html.light,
+:root.light,
+[data-theme='light'] {
+  --theme-canvas: #f8fafc;
+  --theme-canvas-raised: #ffffff;
+  --theme-canvas-sunken: #f1f5f9;
+  --theme-surface: #ffffff;
+  --theme-surface-elevated: #f8fafc;
+  --theme-surface-hover: #f1f5f9;
+  --theme-border: #e2e8f0;
+  --theme-border-strong: #cbd5e1;
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #475569;
+  --theme-text-muted: #64748b;
+  --theme-solar-amber: #d97706;
+  --theme-energy-cyan: #0891b2;
+  --theme-network-blue: #2563eb;
+  --theme-battery-green: #059669;
+  --theme-ai-violet: #7c3aed;
+  --theme-warning-amber: #d97706;
+  --theme-critical-red: #dc2626;
+  --theme-mark-s: 80%;
+  --theme-mark-l: 40%;
+  --theme-viewer-center: #f8fafc;
+  --theme-viewer-edge: #cbd5e1;
+  --theme-scene-ink: #1e293b;
+}
+
+@theme {
+  --color-canvas: var(--theme-canvas);
+  --color-scene-ink: var(--theme-scene-ink);
+  --color-canvas-raised: var(--theme-canvas-raised);
+  --color-canvas-sunken: var(--theme-canvas-sunken);
+  --color-surface: var(--theme-surface);
+  --color-surface-elevated: var(--theme-surface-elevated);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-border: var(--theme-border);
+  --color-border-strong: var(--theme-border-strong);
+  --color-text-primary: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-muted: var(--theme-text-muted);
+  --color-solar-amber: var(--theme-solar-amber);
+  --color-energy-cyan: var(--theme-energy-cyan);
+  --color-network-blue: var(--theme-network-blue);
+  --color-battery-green: var(--theme-battery-green);
+  --color-ai-violet: var(--theme-ai-violet);
+  --color-warning-amber: var(--theme-warning-amber);
+  --color-critical-red: var(--theme-critical-red);
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --radius-control-sm: 8px;
+  --radius-modal: 20px;
+
+  --spacing-sidebar: 232px;
+  --spacing-header: 68px;
+  --spacing-copilot: 360px;
+
+  /* Glass terminal (copilot over the full-screen village): rim light + violet glow under the glass. */
+  --shadow-glass-glow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 14%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-ai-violet) 28%, transparent),
+    0 24px 80px -24px color-mix(in srgb, var(--color-ai-violet) 65%, transparent);
+
+  --duration-fast: 150ms;
+  --duration-panel: 220ms;
+}
+
+/* 3D object viewer: studio backdrop, light centre behind the object, darker edges. */
+.viewer-studio {
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    var(--theme-viewer-center) 0%,
+    var(--theme-viewer-edge) 78%
+  );
+}
+
+/* One object's colour: `--mark-h` (hue) and `--mark-dl` (lightness step) set inline per object. */
+[data-mark] {
+  --mark: hsl(
+    var(--mark-h, 190) var(--theme-mark-s) calc(var(--theme-mark-l) + var(--mark-dl, 0%))
+  );
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Floating translucent rounded scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-text-secondary) 30%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--color-text-secondary) 28%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--color-text-secondary) 55%, transparent);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in srgb, var(--color-text-primary) 70%, transparent);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
